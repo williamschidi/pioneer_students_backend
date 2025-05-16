@@ -5,6 +5,7 @@ exports.getAllUsers = async (reg, res) => {
     const members = await Members.find();
     res.status(200).json({
       status: "success",
+      count: members.length,
       data: {
         members,
       },
