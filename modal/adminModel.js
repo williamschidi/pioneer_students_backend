@@ -60,6 +60,7 @@ const adminSchema = new mongoose.Schema({
       message: "Password and Confirm password does not match",
     },
   },
+
   passwordChangedAt: Date,
   passwordResetToken: {
     type: String,

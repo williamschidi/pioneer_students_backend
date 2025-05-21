@@ -1,13 +1,22 @@
 const Members = require("../modal/memberModel");
 
-exports.getAllUsers = async (reg, res) => {
+exports.getUsers = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 2;
+
   try {
-    const members = await Members.find();
+    const members = await Members.find({}, "firstName lastName email phone")
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await Members.countDocuments();
     res.status(200).json({
       status: "success",
-      count: members.length,
       data: {
         members,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
       },
     });
   } catch (err) {
@@ -17,18 +26,19 @@ exports.getAllUsers = async (reg, res) => {
   }
 };
 
-exports.createUser = async (reg, res) => {
+exports.createUser = async (req, res) => {
   try {
     const newMember = await Members.create(req.body);
     res.status(201).json({
-      status: success,
+      status: "success",
+      message: "Member successfully created",
       data: {
         newMember,
       },
     });
   } catch (err) {
-    err.status(400).json({
-      error: err.message,
+    res.status(400).json({
+      error: err.stack,
     });
   }
 };
@@ -78,5 +88,25 @@ exports.deleteUser = async (req, res) => {
     err.status(400).json({
       error: err.message,
     });
+  }
+};
+
+exports.getUser = async (req, res) => {
+  try {
+    const member = await Members.findById(req.params.id);
+    if (!member) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "User not found. Please provide a valid ID",
+      });
+    }
+    res.status(200).json({
+      status: " success",
+      data: {
+        member,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

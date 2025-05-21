@@ -17,8 +17,8 @@ exports.CreateStates = async (req, res, next) => {
 exports.getAllStates = async (req, res) => {
   try {
     const getStates = await States.find({ isActive: true })
-      .select("name,value")
-      .sort({ name: 1 });
+      .select("state value localGovernments")
+      .sort({ state: 1 });
     res.status(200).json({
       data: {
         getStates,
