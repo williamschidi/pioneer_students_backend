@@ -181,10 +181,20 @@ exports.logout = (req, res, next) => {
     httpOnly: true,
     sameSite: "strict",
     secure: process.env.NODE_ENV !== "development",
+    expires: new Date(0),
   });
 
   res.status(200).json({
     status: "success",
     message: "Logout successful",
+  });
+};
+
+exports.verified = (req, res) => {
+  res.status(200).json({
+    status: "success",
+    data: {
+      username: req.admin.firstName,
+    },
   });
 };

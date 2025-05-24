@@ -52,6 +52,10 @@ const memberSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide your local government of origin"],
   },
+  profilePic: {
+    public_id: String,
+    url: String,
+  },
 });
 
 module.exports = mongoose.model("Members", memberSchema);

@@ -1,5 +1,9 @@
 const express = require("express");
 
+const multer = require("multer");
+const { storage } = require("./../config/cloudinaryConfig");
+const upload = multer({ storage });
+
 const {
   getUsers,
   createUser,
@@ -12,7 +16,14 @@ const { protect } = require("../controller/adminController");
 const router = express.Router();
 
 // routes
-router.route("/").get(getUsers).post(protect, createUser);
-router.route("/:id").get(getUser).patch(updateUser).delete(deleteUser);
+router
+  .route("/")
+  .get(getUsers)
+  .post(protect, upload.single("profilePic"), createUser);
+router
+  .route("/:id")
+  .get(getUser)
+  .patch(upload.single("profilePic"), updateUser)
+  .delete(protect, deleteUser);
 
 module.exports = router;

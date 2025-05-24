@@ -7,6 +7,7 @@ const {
   login,
   logout,
   protect,
+  verified,
 } = require("../controller/adminController");
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.route("/protected").get(protect, (req, res) => {
 router.route("/signup").post(signup);
 router.route("/login").post(login);
 router.route("/logout").post(logout);
+router.route("/verify").get(protect, verified);
 router.route("/:id").patch(updateAdmin).delete(deleteAdmin);
 
 module.exports = router;
