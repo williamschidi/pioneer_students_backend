@@ -10,7 +10,12 @@ const app = express();
 
 // enable cors for frontend
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(
+  cors({
+    origin: "https://pioneer-students-of-st-marks-sec-sch.netlify.app/",
+    credentials: true,
+  })
+);
 
 // middleware to parse json
 app.use(cookieParser());
