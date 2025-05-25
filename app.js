@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://pioneer-students-of-st-marks-sec-sch.netlify.app/",
+    origin: "https://pioneer-students-of-st-marks-sec-sch.netlify.app",
     credentials: true,
   })
 );
