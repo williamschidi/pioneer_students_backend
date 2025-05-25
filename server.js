@@ -12,8 +12,8 @@ if (!process.env.CONN_STR) {
 
 const connectDB = async () => {
   try {
-    // await mongoose.connect(process.env.CONN_STR);
-    await mongoose.connect(process.env.LOCAL_CONN);
+    await mongoose.connect(process.env.CONN_STR);
+    // await mongoose.connect(process.env.LOCAL_CONN);
     console.log("MongoDB connection successful");
   } catch (err) {
     console.log("error occur", err.message);
