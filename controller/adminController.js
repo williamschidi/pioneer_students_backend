@@ -176,7 +176,7 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-exports.logout = (req, res, next) => {
+exports.logout = (req, res) => {
   res.cookie("jwt", "", {
     httpOnly: true,
     sameSite: "strict",
