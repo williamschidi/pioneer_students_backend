@@ -28,8 +28,8 @@ const generalLimiter = rateLimit({
 
 app.use(
   cors({
-    // origin: "https://pioneer-students-of-st-marks-sec-sch.netlify.app",
-    origin: "http://localhost:5173",
+    origin: "https://pioneer-students-of-st-marks-sec-sch.netlify.app",
+    // origin: "http://localhost:5173",
     credentials: true,
   })
 );
