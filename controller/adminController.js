@@ -1,6 +1,8 @@
 const Admin = require("./../modal/adminModel");
 const jwt = require("jsonwebtoken");
 const util = require("util");
+const asyncErrorHandler = require("./../utils/asyncErrorHandler");
+const CustomError = require("../utils/customError");
 
 // console.log(require("crypto").randomBytes(64).toString("hex"));
 
@@ -17,164 +19,122 @@ const signToken = (id, res) => {
   });
 };
 
-exports.getAllAdmins = async (req, res, next) => {
-  try {
-    const allAdmins = await Admin.find();
-    res.status(200).json({
-      status: "success",
-      count: allAdmins.length,
-      data: {
-        allAdmins,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
-  }
-};
+exports.getAllAdmins = asyncErrorHandler(async (req, res, next) => {
+  const allAdmins = await Admin.find();
+  res.status(200).json({
+    status: "success",
+    count: allAdmins.length,
+    data: {
+      allAdmins,
+    },
+  });
+});
 
-exports.signup = async (req, res, next) => {
-  try {
-    const newAdmin = await Admin.create(req.body);
+exports.signup = asyncErrorHandler(async (req, res, next) => {
+  const newAdmin = await Admin.create(req.body);
 
-    const token = signToken(newAdmin._id, res);
+  const token = signToken(newAdmin._id, res);
 
-    res.status(200).json({
-      status: "success",
-      token,
-      data: {
-        newAdmin,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
-  }
-};
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      newAdmin,
+    },
+  });
+});
 
-exports.updateAdmin = async (req, res, next) => {
-  try {
-    const updateAdminData = await Admin.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
+exports.updateAdmin = asyncErrorHandler(async (req, res, next) => {
+  const updateAdminData = await Admin.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updateAdminData) {
+    return next(
+      new CustomError("Admin not found. please provide a valid ID", 400)
     );
-
-    if (!updateAdminData) {
-      return res.status(400).json({
-        message: "Admin not found. please provide a valid ID.",
-      });
-    }
-
-    res.status(200).json({
-      status: "Success",
-      data: {
-        updateAdminData,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
   }
-};
 
-exports.deleteAdmin = async (req, res, next) => {
-  try {
-    const deleteAdminData = await Admin.findByIdAndDelete(req.params.id);
-    if (!deleteAdminData) {
-      return res.status(400).json({
-        message: "Admin not found. Please provide a valid ID",
-      });
-    }
+  res.status(200).json({
+    status: "Success",
+    data: {
+      updateAdminData,
+    },
+  });
+});
 
-    res.status(201).json({
-      status: "success",
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
-  }
-};
-
-exports.login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Please provide Email and Password.",
-      });
-    }
-
-    const adminLogin = await Admin.findOne({ email }).select("+password");
-
-    const isMatch = await adminLogin.comparePassword(
-      password,
-      adminLogin.password
+exports.deleteAdmin = asyncErrorHandler(async (req, res, next) => {
+  const deleteAdminData = await Admin.findByIdAndDelete(req.params.id);
+  if (!deleteAdminData) {
+    return next(
+      new CustomError("Admin not found. Please provide a valid ID", 400)
     );
-
-    if (!adminLogin || !isMatch) {
-      return res.status(400).json({
-        message: "Password does not match. please provide a correct password",
-      });
-    }
-
-    const token = signToken(adminLogin._id, res);
-
-    res.status(200).json({
-      status: "success",
-      token,
-      data: {
-        name: adminLogin.firstName,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
   }
-};
 
-exports.protect = async (req, res, next) => {
-  try {
-    const token = req.cookies.jwt;
+  res.status(201).json({
+    status: "success",
+  });
+});
 
-    if (!token) {
-      return res.status(401).json({
-        status: "Failed",
-        message: "You are not loggedIn. Please login",
-      });
-    }
+exports.login = asyncErrorHandler(async (req, res, next) => {
+  const { email, password } = req.body;
 
-    const decodedToken = await util.promisify(jwt.verify)(
-      token,
-      process.env.SECRET_WORD
+  if (!email || !password) {
+    return next(new CustomError("Please provide Email and Password", 400));
+  }
+
+  const adminLogin = await Admin.findOne({ email }).select("+password");
+
+  const isMatch = await adminLogin.comparePassword(
+    password,
+    adminLogin.password
+  );
+
+  if (!adminLogin || !isMatch) {
+    return next(
+      new CustomError(
+        "Password does not match. please provide a correct password",
+        400
+      )
     );
-
-    const currentUser = await Admin.findById(decodedToken.id);
-    if (!currentUser) {
-      return res.status(401).json({
-        status: "Failed",
-        message: "Admin with given token does not exit",
-      });
-    }
-
-    req.admin = currentUser;
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      status: "Failed",
-      message: "Authentication failed. Please login",
-    });
   }
-};
+
+  const token = signToken(adminLogin._id, res);
+
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      name: adminLogin.firstName,
+    },
+  });
+});
+
+exports.protect = asyncErrorHandler(async (req, res, next) => {
+  const token = req.cookies.jwt;
+
+  if (!token) {
+    return next(new CustomError("You are not loggedIn. Please login", 401));
+  }
+
+  const decodedToken = await util.promisify(jwt.verify)(
+    token,
+    process.env.SECRET_WORD
+  );
+
+  const currentUser = await Admin.findById(decodedToken.id);
+  if (!currentUser) {
+    return next(new CustomError("Admin with given token does not exit", 401));
+  }
+
+  req.admin = currentUser;
+  next();
+});
 
 exports.logout = (req, res) => {
   res.cookie("jwt", "", {

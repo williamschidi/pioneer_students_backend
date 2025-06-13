@@ -12,8 +12,8 @@ if (!process.env.CONN_STR) {
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.CONN_STR);
-    // await mongoose.connect(process.env.LOCAL_CONN);
+    // await mongoose.connect(process.env.CONN_STR);
+    await mongoose.connect(process.env.LOCAL_CONN);
     console.log("MongoDB connection successful");
   } catch (err) {
     console.log("error occur", err.message);
@@ -22,7 +22,7 @@ const connectDB = async () => {
 
 connectDB();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3003;
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

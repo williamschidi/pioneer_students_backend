@@ -13,14 +13,16 @@ const memberSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Email is required"],
-    unique: [true, "This email is already used"],
+
+    unique: true,
     validate: [validator.isEmail, "Pls enter a valid email."],
     lowercase: true,
   },
   phone: {
     type: String,
     required: [true, "Phone number is required"],
-    unique: [true, "This phone number has already been used"],
+
+    unique: true,
     validate: {
       validator: function (num) {
         return validator.isMobilePhone(num, "en-NG", { strictMode: false });

@@ -40,7 +40,7 @@ stateSchema.pre("save", function (next) {
 
   const uniqueLgNames = new Set(lgNames);
 
-  if (uniqueLgNames.size !== lgNames.len) {
+  if (uniqueLgNames.size !== lgNames.length) {
     return next(
       new Error("Local Government names must be unique within the same state!")
     );

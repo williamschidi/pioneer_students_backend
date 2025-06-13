@@ -10,16 +10,20 @@ const {
   updateUser,
   deleteUser,
   getUser,
+  getSearchedUsers,
 } = require("./../controller/memberController");
-const { protect } = require("../controller/adminController");
+const { protect } = require("./../controller/adminController");
 
 const router = express.Router();
 
 // routes
+
+router.route("/search").get(getSearchedUsers);
 router
   .route("/")
   .get(getUsers)
   .post(protect, upload.single("profilePic"), createUser);
+
 router
   .route("/:id")
   .get(getUser)
