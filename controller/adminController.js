@@ -13,9 +13,9 @@ const signToken = (id, res) => {
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    sameSite: "none",
+    sameSite: "None",
     maxAge: 24 * 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
   });
 };
 
