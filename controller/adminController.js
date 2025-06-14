@@ -13,7 +13,7 @@ const signToken = (id, res) => {
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
     secure: process.env.NODE_ENV !== "development",
   });
