@@ -53,17 +53,17 @@ exports.createUser = asyncErrorHandler(async (req, res, next) => {
 exports.updateUser = asyncErrorHandler(async (req, res, next) => {
   let updatedData = { ...req.body };
 
-  const updateMember = await Members.findById(req.params.id);
+  const getMember = await Members.findById(req.params.id);
 
-  if (!updateMember) {
+  if (!getMember) {
     return next(
       new CustomError("Member not found. Please provide a valid ID", 404)
     );
   }
 
   if (req.file) {
-    if (updateMember.profilePic && updateMember.profilePic.public_id) {
-      await cloudinary.uploader.destroy(updateMember.profilePic.public_id);
+    if (getMember.profilePic && getMember.profilePic.public_id) {
+      await cloudinary.uploader.destroy(getMember.profilePic.public_id);
     }
 
     const uploadResult = await new Promise((resolve, reject) => {
@@ -94,7 +94,7 @@ exports.updateUser = asyncErrorHandler(async (req, res, next) => {
     }
   );
 
-  res.status(200).json({
+  res.status(201).json({
     status: "success",
     data: {
       updatedMember,

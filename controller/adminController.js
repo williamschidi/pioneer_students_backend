@@ -15,7 +15,7 @@ const signToken = (id, res) => {
     httpOnly: true,
     sameSite: "None",
     maxAge: 24 * 60 * 60 * 1000,
-    secure: true,
+    secure: process.env.NODE_ENV !== "development",
   });
 };
 
@@ -40,6 +40,7 @@ exports.signup = asyncErrorHandler(async (req, res, next) => {
     token,
     data: {
       newAdmin,
+      name: newAdmin.firstName,
     },
   });
 });
