@@ -5,7 +5,7 @@ const asyncErrorHandler = require("./../utils/asyncErrorHandler");
 
 exports.getUsers = asyncErrorHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 2;
+  const limit = parseInt(req.query.limit) || 6;
 
   const members = await Members.find(
     {},
@@ -35,7 +35,11 @@ exports.createUser = asyncErrorHandler(async (req, res, next) => {
       folder: "profilePics",
     });
 
-    profilePicUrl = { url: result.secure_url, public_id: result.public_id };
+    profilePicUrl = {
+      url: result.secure_url,
+      public_id: result.public_id,
+      format: result.format,
+    };
   }
   const memberData = { ...req.body, profilePic: profilePicUrl };
 
@@ -52,6 +56,7 @@ exports.createUser = asyncErrorHandler(async (req, res, next) => {
 
 exports.updateUser = asyncErrorHandler(async (req, res, next) => {
   let updatedData = { ...req.body };
+  console.log(updatedData);
 
   const getMember = await Members.findById(req.params.id);
 
@@ -66,19 +71,10 @@ exports.updateUser = asyncErrorHandler(async (req, res, next) => {
       await cloudinary.uploader.destroy(getMember.profilePic.public_id);
     }
 
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "profile_pics",
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        )
-        .end(req.file.buffer);
+    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "profile_pics",
     });
+
     updatedData.profilePic = {
       url: uploadResult.secure_url,
       public_id: uploadResult.public_id,
@@ -136,8 +132,10 @@ exports.getSearchedUsers = asyncErrorHandler(async (req, res, next) => {
       )
     );
   }
+
   res.status(200).json({
     status: "Success",
+    total: searchedMembers.length,
     data: {
       searchedMembers,
     },
