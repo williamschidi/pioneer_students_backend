@@ -120,6 +120,7 @@ exports.deleteUser = asyncErrorHandler(async (req, res, next) => {
 
 exports.getSearchedUsers = asyncErrorHandler(async (req, res, next) => {
   const { lastName } = req.query;
+  console.log(lastName);
 
   const searchedMembers = await Members.find(
     { lastName: { $regex: `^${lastName}` } },
