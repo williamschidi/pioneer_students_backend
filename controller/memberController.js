@@ -122,7 +122,7 @@ exports.getSearchedUsers = asyncErrorHandler(async (req, res, next) => {
   const { lastName } = req.query;
 
   const searchedMembers = await Members.find(
-    { lastName },
+    { lastName: { $regex: `^${lastName}` } },
     "firstName lastName email phone profilePic"
   );
   if (searchedMembers.length === 0) {
